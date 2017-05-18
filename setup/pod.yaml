@@ -8,14 +8,18 @@ spec:
       image: hostpath-provisioner:latest
       imagePullPolicy: "IfNotPresent"
       env:
+        - name: HOSTPATH_TO_USE
+          value: /var/openshift/
         - name: NODE_NAME
           valueFrom:
             fieldRef:
               fieldPath: spec.nodeName
       volumeMounts:
         - name: pv-volume
-          mountPath: /tmp/hostpath-provisioner
+          mountPath: /var/openshift
   volumes:
     - name: pv-volume
       hostPath:
-        path: /tmp/hostpath-provisioner
+        path: /var/openshift
+  serviceAccount: hostpath-provisioner
+  
