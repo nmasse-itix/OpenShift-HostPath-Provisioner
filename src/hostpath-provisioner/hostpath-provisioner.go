@@ -35,7 +35,7 @@ import (
 
 const (
 	resyncPeriod              = 15 * time.Second
-	provisionerName           = "example.com/hostpath"
+	provisionerName           = "itix.fr/hostpath"
 	exponentialBackOffOnError = false
 	failedRetryThreshold      = 5
 	leasePeriod               = controller.DefaultLeaseDuration
@@ -58,8 +58,12 @@ func NewHostPathProvisioner() controller.Provisioner {
 	if nodeName == "" {
 		glog.Fatal("env variable NODE_NAME must be set so that this provisioner can identify itself")
 	}
+	hostPath := os.Getenv("HOSTPATH_TO_USE")
+	if hostPath == "" {
+		glog.Fatal("env variable HOSTPATH_TO_USE must be set")
+	}
 	return &hostPathProvisioner{
-		pvDir:    "/tmp/hostpath-provisioner",
+		pvDir:    hostPath,
 		identity: nodeName,
 	}
 }
@@ -110,9 +114,11 @@ func (p *hostPathProvisioner) Delete(volume *v1.PersistentVolume) error {
 	}
 
 	path := path.Join(p.pvDir, volume.Name)
-	if err := os.RemoveAll(path); err != nil {
-		return err
-	}
+
+	// Not for the moment, please !
+	//if err := os.RemoveAll(path); err != nil {
+	//	return err
+	//}
 
 	return nil
 }

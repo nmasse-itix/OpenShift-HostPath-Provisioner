@@ -1,5 +1,5 @@
 kind: StorageClass
 apiVersion: storage.k8s.io/v1beta1
 metadata:
-  name: example-hostpath
-provisioner: example.com/hostpath
+  name: hostpath-provisioner
+provisioner: itix.fr/hostpath
