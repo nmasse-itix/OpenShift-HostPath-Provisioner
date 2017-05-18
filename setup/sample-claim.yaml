@@ -3,8 +3,9 @@
     "kind": "PersistentVolumeClaim",
     "metadata": {
         "name": "pvc-test"
-        "annotations":
-            "volume.beta.kubernetes.io/storage-class": "hostpath-provisioner"
+        "annotations": {
+          "volume.beta.kubernetes.io/storage-class": "hostpath-provisioner"
+        }
     },
     "spec": {
         "accessModes": [ "ReadWriteOnce" ],
