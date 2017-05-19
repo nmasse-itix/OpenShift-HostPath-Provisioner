@@ -97,13 +97,19 @@ objects:
   - persistentVolumeClaim
   - secret
 
-- apiVersion: 1
+- apiVersion: extensions/v1beta1
   kind: DaemonSet
   metadata:
     name: hostpath-provisioner
     namespace: ${TARGET_NAMESPACE}
   spec:
+    selector:
+      matchLabels:
+        name: hostpath-provisioner
     template:
+      metadata:
+        labels:
+          name: hostpath-provisioner
       spec:
         containers:
           name: hostpath-provisioner
