@@ -18,7 +18,7 @@ $ oc create -f objects.json
 ```
 $ oc project my-project
 $ oc create -f setup/sample-claim.yaml
-$ ls -l /tmp/openshift/
+$ find /tmp/openshift/
 ```
 
 ### Cleanup
@@ -57,7 +57,7 @@ $ oc process -f setup/hostpath-provisioner-template.yaml -p HOSTPATH_PROVISIONER
 ```
 $ oc project my-project
 $ oc create -f setup/sample-claim.yaml
-$ ls -l /tmp/openshift/
+$ find /tmp/openshift/
 ```
 
 ### Cleanup
@@ -69,6 +69,7 @@ $ oc delete clusterrolebinding hostpath-provisioner
 $ oc delete clusterrole hostpath-provisioner
 $ oc delete scc hostpath-provisioner
 $ oc delete sa hostpath-provisioner
+$ oc delete storageclass hostpath-provisioner
 ```
 
 ### Pushing your image to DockerHub (Optional)
