@@ -5,14 +5,14 @@ a packaged and polished version of the Kubernetes Incubator's Hostpath Provision
 
 The original license is Apache 2.0. This project remains under the same license.
 
-Main differences from the original project :
+_Main differences from the original project :_
  - OpenShift Template that works Out-of-the-Box
  - Naming convention (namespace/pvc-name instead of GUID)
  - Configurable root directory (HOSTPATH_TO_USE parameter)
  - Docker Image available on DockerHub (https://hub.docker.com/r/nmasse/openshift-hostpath-provisioner/)
 
-Current limitations :
- - DO NOT USE IT IN PRODUCTION
+_Current limitations :_
+ - **DO NOT USE IT IN PRODUCTION**
  - Only works on OpenShift clusters that have a single node
 
 ## If you just want to use it
@@ -79,7 +79,7 @@ oc process -f setup/hostpath-provisioner-template.yaml -p TARGET_NAMESPACE=my-pr
 oc create -f objects.json
 ```
 
-*Note about the file 'objects.json' :*
+_Note about the file 'objects.json' :_
 
 It's a good idea to keep that file safe since it will be use to clean up your OpenShift
 instance in case you change your mind. See the cleanup section below.
