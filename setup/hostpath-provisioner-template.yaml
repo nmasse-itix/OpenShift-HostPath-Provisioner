@@ -129,7 +129,7 @@ parameters:
 - description: Name of the Docker Image to be used for the Hostpath Provisioner DaemonSet.
   displayName: Hostpath Provisioner Docker Image
   name: HOSTPATH_PROVISIONER_IMAGE
-  value: hostpath-provisioner:latest
+  value: nmasse/openshift-hostpath-provisioner:latest
 - description: The OpenShift Namespace on which you want to deploy the Hostpath Provisioner.
   displayName: Hostpath Provisioner Target Namespace
   name: TARGET_NAMESPACE
