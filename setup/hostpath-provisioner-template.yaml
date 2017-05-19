@@ -1,0 +1,140 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: hostpath-provisioner-template
+message: An hostpath provisioner has been created in your project.
+  Look at https://github.com/nmasse-itix/OpenShift-HostPath-Provisioner
+  for more information about using this template.
+metadata:
+  annotations:
+    description: |-
+      A storage provisioner that provision hostPath PV
+
+      NOTE: Cannot be used in production or in a multi-node cluster.
+    iconClass: icon-jenkins
+    openshift.io/display-name: Hostpath Provisioner
+    tags: storage
+    template.openshift.io/documentation-url: https://github.com/nmasse-itix/OpenShift-HostPath-Provisioner
+    template.openshift.io/long-description: A storage provisioner that provision hostPath PV
+    template.openshift.io/provider-display-name: Nicolas Masse <nicolas.masse@itix.fr>
+    template.openshift.io/support-url: https://github.com/nmasse-itix/OpenShift-HostPath-Provisioner/issues
+  name: hostpath-provisioner
+objects:
+- apiVersion: v1
+  kind: ServiceAccount
+  metadata:
+    name: hostpath-provisioner
+    namespace: ${TARGET_NAMESPACE}
+
+- kind: ClusterRole
+  apiVersion: v1
+  metadata:
+    name: hostpath-provisioner
+  rules:
+   - apiGroups: [""]
+     resources: ["persistentvolumes"]
+     verbs: ["get", "list", "watch", "create", "delete"]
+   - apiGroups: [""]
+     resources: ["persistentvolumeclaims"]
+     verbs: ["get", "list", "watch", "update"]
+   - apiGroups: ["storage.k8s.io"]
+     resources: ["storageclasses"]
+     verbs: ["get", "list", "watch"]
+   - apiGroups: [""]
+     resources: ["events"]
+     verbs: ["list", "watch", "create", "update", "patch"]
+   - apiGroups: [""]
+     resources: ["services", "endpoints"]
+     verbs: ["get"]
+
+- apiVersion: v1
+  groupNames: null
+  kind: ClusterRoleBinding
+  metadata:
+    name: hostpath-provisioner
+  roleRef:
+    name: hostpath-provisioner
+  subjects:
+  - kind: ServiceAccount
+    name: hostpath-provisioner
+    namespace: ${TARGET_NAMESPACE}
+  userNames:
+  - system:serviceaccount:${TARGET_NAMESPACE}:hostpath-provisioner
+
+- apiVersion: v1
+  kind: SecurityContextConstraints
+  metadata:
+    annotations:
+      kubernetes.io/description: 'hostpath-provisioner is a copy of the default hostmount-anyuid scc.'
+    name: hostpath-provisioner
+  allowHostDirVolumePlugin: true
+  allowHostIPC: false
+  allowHostNetwork: false
+  allowHostPID: false
+  allowHostPorts: false
+  allowPrivilegedContainer: false
+  allowedCapabilities: null
+  defaultAddCapabilities: null
+  fsGroup:
+    type: RunAsAny
+  priority: null
+  readOnlyRootFilesystem: false
+  requiredDropCapabilities: null
+  runAsUser:
+    type: RunAsAny
+  seLinuxContext:
+    type: MustRunAs
+  supplementalGroups:
+    type: RunAsAny
+  users:
+  - system:serviceaccount:${TARGET_NAMESPACE}:hostpath-provisioner
+  volumes:
+  - configMap
+  - downwardAPI
+  - emptyDir
+  - hostPath
+  - nfs
+  - persistentVolumeClaim
+  - secret
+
+- apiVersion: 1
+  kind: DaemonSet
+  metadata:
+    name: hostpath-provisioner
+    namespace: ${TARGET_NAMESPACE}
+  spec:
+    template:
+      spec:
+        containers:
+          name: hostpath-provisioner
+          image: ${HOSTPATH_PROVISIONER_IMAGE}
+          imagePullPolicy: "IfNotPresent"
+          env:
+            - name: HOSTPATH_TO_USE
+              value: ${HOSTPATH_TO_USE}
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          volumeMounts:
+            - name: pv-volume
+              mountPath: ${HOSTPATH_TO_USE}
+        volumes:
+          - name: pv-volume
+            hostPath:
+              path: ${HOSTPATH_TO_USE}
+        serviceAccount: hostpath-provisioner
+
+parameters:
+- description: Name of the Docker Image to be used for the Hostpath Provisioner DaemonSet.
+  displayName: Hostpath Provisioner Docker Image
+  name: HOSTPATH_PROVISIONER_IMAGE
+  value: hostpath-provisioner:latest
+- description: The OpenShift Namespace on which you want to deploy the Hostpath Provisioner.
+  displayName: Hostpath Provisioner Target Namespace
+  name: TARGET_NAMESPACE
+  value: default
+- description: A path on the host to on which the Hostpath Provisioner can create PVs.
+  displayName: Host Path
+  name: HOSTPATH_TO_USE
+  value: /tmp/openshift
