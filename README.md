@@ -5,8 +5,12 @@
 ### Setup
 
 ```
+$ mkdir /tmp/openshift
+$ chmod 777 /tmp/openshift
+$ chcon -Rt svirt_sandbox_file_t /tmp/openshift
 $ oc project default
-$ oc process -f setup/hostpath-provisioner-template.yaml | oc create -f -
+$ oc process -f setup/hostpath-provisioner-template.yaml > objects.json
+$ oc create -f objects.json
 ```
 
 ### Test
@@ -21,7 +25,7 @@ $ ls -l /tmp/openshift/
 
 ```
 $ oc project default
-$ oc delete all -l template=hostpath-provisioner-template
+$ oc delete all -f objects.json
 ```
 
 ## If you want to hack it
@@ -61,6 +65,10 @@ $ ls -l /tmp/openshift/
 ```
 $ oc project default
 $ oc delete all -l template=hostpath-provisioner-template
+$ oc delete clusterrolebinding hostpath-provisioner
+$ oc delete clusterrole hostpath-provisioner
+$ oc delete scc hostpath-provisioner
+$ oc delete sa hostpath-provisioner
 ```
 
 ### Pushing your image to DockerHub (Optional)
