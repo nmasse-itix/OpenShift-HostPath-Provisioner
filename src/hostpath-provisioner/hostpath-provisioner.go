@@ -22,6 +22,7 @@ import (
 	"os"
 	"path"
 	"time"
+	"fmt"
 
 	"github.com/golang/glog"
 	"github.com/kubernetes-incubator/external-storage/lib/controller"
@@ -35,6 +36,10 @@ import (
 
 const (
 	resyncPeriod              = 15 * time.Second
+	//
+	// The provisionerName has to match the "provisioner" field of the
+	// Kubernetes StorageClass object
+	//
 	provisionerName           = "itix.fr/hostpath"
 	exponentialBackOffOnError = false
 	failedRetryThreshold      = 5
@@ -70,9 +75,59 @@ func NewHostPathProvisioner() controller.Provisioner {
 
 var _ controller.Provisioner = &hostPathProvisioner{}
 
+func (p *hostPathProvisioner) generatePVPath(options controller.VolumeOptions) (string, error) {
+	// Default value for Name Generation
+	namespace := "_"
+	name := options.PVName
+
+	// Try to get information from PVC
+	if pvc := options.PVC; pvc != nil {
+		// Get PVC namespace if it exists
+		ns := pvc.Namespace
+		if ns != "" {
+			namespace = ns
+		}
+
+		// Get PVC name if it exists
+		n := pvc.Name
+		if n != "" {
+			name = n
+		}
+	}
+
+	// Try to create namespace dir if it does not exist
+	nspath := path.Join(p.pvDir, namespace)
+	if _, err := os.Stat(nspath); os.IsNotExist(err) {
+		if err := os.MkdirAll(nspath, 0777); err != nil {
+			return "", err
+		}
+	}
+
+	// Check if pvc name already exists
+	pvpath := path.Join(nspath, name)
+	if _, err := os.Stat(pvpath); err == nil {
+		// If yes, try to generate a new name
+		for i := 1; i < 100; i++ {
+			 new_name := fmt.Sprintf("%s-%02d", name, i)
+			 new_pvpath := path.Join(nspath, new_name)
+			 if _, err := os.Stat(new_pvpath); os.IsNotExist(err) {
+				 // Found a free name
+				 name = new_name
+				 pvpath = new_pvpath
+				 return pvpath, nil
+			 }
+		}
+	}
+
+	return pvpath, nil
+}
+
 // Provision creates a storage asset and returns a PV object representing it.
 func (p *hostPathProvisioner) Provision(options controller.VolumeOptions) (*v1.PersistentVolume, error) {
-	path := path.Join(p.pvDir, options.PVName)
+	path, err := p.generatePVPath(options)
+	if err != nil {
+		return nil, err
+	}
 
 	if err := os.MkdirAll(path, 0777); err != nil {
 		return nil, err
