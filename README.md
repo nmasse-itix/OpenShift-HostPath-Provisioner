@@ -11,6 +11,10 @@ Main differences from the original project :
  - Configurable root directory (HOSTPATH_TO_USE parameter)
  - Docker Image available on DockerHub (https://hub.docker.com/r/nmasse/openshift-hostpath-provisioner/)
 
+Current limitations :
+ - DO NOT USE IT IN PRODUCTION
+ - Only works on OpenShift clusters that have a single node
+
 ## If you just want to use it
 
 If you just want to use this project, without having to compile or debug,
@@ -27,6 +31,13 @@ chcon -Rt svirt_sandbox_file_t /tmp/openshift
 
 If you chose a different path, mind that you will have to pass the HOSTPATH_TO_USE
 parameter to the OpenShift template (-p HOSTPATH_TO_USE=/path/to/other/directory).
+
+In order to setup the hostpath provisioner, you have to be cluster admin on your
+OpenShift instance. There are multiple ways to login with cluster admin rights,
+one way is to use your kube.config file on the master :
+```
+oc login -u system:admin --config ~/.kube/config
+```
 
 Then, you will have to process the template and create the generated objects :
 ```
