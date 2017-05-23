@@ -135,6 +135,8 @@ objects:
   kind: StorageClass
   metadata:
     name: hostpath-provisioner
+    annotations:
+      storageclass.beta.kubernetes.io/is-default-class: "true"
   provisioner: itix.fr/hostpath
 
 parameters:
