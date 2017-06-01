@@ -92,7 +92,7 @@ A sample PersistentVolumeClaim object is provided to test the provisioner :
 ```
 oc project my-project
 oc create -f setup/sample-claim.yaml
-find /tmp/openshift/
+find /var/openshift/
 ```
 
 ### Cleanup
