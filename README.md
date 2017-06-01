@@ -1,7 +1,8 @@
 # An Hostpath Provisioner for OpenShift
 
 This project solves the PersistentVolume provisioning in OpenShift. It is mainly
-a packaged and polished version of the Kubernetes Incubator's Hostpath Provisioner.
+a packaged and polished version of the Kubernetes Incubator's Hostpath Provisioner
+(https://github.com/kubernetes-incubator/external-storage/tree/master/docs/demo/hostpath-provisioner).
 
 The original license is Apache 2.0. This project remains under the same license.
 
@@ -24,9 +25,9 @@ here is the way to go.
 
 First, you will have to create a directory that will hold all PersistentVolumes :
 ```
-mkdir /tmp/openshift
-chmod 777 /tmp/openshift
-chcon -Rt svirt_sandbox_file_t /tmp/openshift
+mkdir /var/openshift
+chmod 777 /var/openshift
+chcon -Rt svirt_sandbox_file_t /var/openshift
 ```
 
 If you chose a different path, mind that you will have to pass the HOSTPATH_TO_USE

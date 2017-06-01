@@ -151,4 +151,4 @@ parameters:
 - description: A path on the host to on which the Hostpath Provisioner can create PVs.
   displayName: Host Path
   name: HOSTPATH_TO_USE
-  value: /tmp/openshift
+  value: /var/openshift
